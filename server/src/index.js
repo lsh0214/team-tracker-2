@@ -43,10 +43,10 @@ app.use(morgan('dev'));
 if (env.DISABLE_CORS) {
   console.log('[CORS] CORS disabled for testing');
   app.use(cors({
-    origin: true,
-    credentials: true,
+    origin: env.CLIENT_URLS,
+    credentials: false,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: '*',
+    allowedHeaders: ['Content-Type', 'Authorization'],
   }));
 } else {
   // 멀티 오리진 CORS 설정
