@@ -100,6 +100,14 @@ export default function Login() {
                   가입하기
                 </Link>
               </p>
+
+              {/* ADDED: 비밀번호 찾기 링크를 여기에 추가합니다. */}
+              <p>
+                <Link to="/forgot-password" className="auth-link">
+                  비밀번호를 잊으셨나요?
+                </Link>
+              </p>
+              
               <p>
                 <Link to="/" className="auth-link">
                   ← 홈으로 돌아가기

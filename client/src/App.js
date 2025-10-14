@@ -1,3 +1,4 @@
+// client/src/App.js (최종 수정본)
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -33,17 +34,20 @@ import ReviewManagement from "./pages/ReviewManagement";
 import NotificationCenter from "./pages/NotificationCenter";
 import ActivityFeed from "./pages/ActivityFeed";
 import { useAuth } from "./contexts/AuthContext";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export default function App() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
   const token = localStorage.getItem("token");
 
-  // Show landing page for unauthenticated users
   const shouldShowLanding = !loading && !token && pathname === "/";
 
   const hideNav =
-    pathname === "/login" || pathname === "/signup" || shouldShowLanding;
+    pathname === "/login" || 
+    pathname === "/signup" || 
+    pathname === "/forgot-password" ||
+    shouldShowLanding;
 
   return (
     <>
@@ -51,6 +55,9 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
         <Route
           path="/select-club"
           element={
@@ -71,6 +78,7 @@ export default function App() {
             )
           }
         />
+        {/* ... 이하 다른 모든 경로는 동일 ... */}
         <Route
           path="/admin/users"
           element={
