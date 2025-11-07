@@ -110,7 +110,7 @@ npm start
 ## 4. 환경 변수 설정
 server/.env && client/.env
 
-- hg554889@gmail.com 으로 요청
+- netstat3476@naver.com 으로 요청
 - .env.example 참고
 
 ## 📌 사용 예시
