@@ -3,8 +3,8 @@ import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
 import SelectClub from "./pages/SelectClub";
 import Dashboard from "./pages/Dashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -44,8 +44,8 @@ export default function App() {
   const shouldShowLanding = !loading && !token && pathname === "/";
 
   const hideNav =
-    pathname === "/login" || 
-    pathname === "/signup" || 
+    pathname === "/login" ||
+    pathname === "/signup" ||
     pathname === "/forgot-password" ||
     shouldShowLanding;
 
@@ -55,7 +55,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route
