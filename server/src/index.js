@@ -13,7 +13,7 @@ import { enrichRole } from './middleware/enrichRole.js';
 import { requireApproval } from './middleware/approvalCheck.js';
 import { initializeSocket } from './services/socketService.js';
 
-// ✅ 모든 라우터 import (clubSettings, roleRequests 추가)
+// ✅ 모든 라우터 import (기존과 동일)
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import teamRoutes from './routes/teams.js';
@@ -23,8 +23,8 @@ import clubRoutes from './routes/clubs.js';
 import inviteRoutes from './routes/invites.js';
 import aiRoutes from './routes/ai.js';
 import approvalRoutes from './routes/approvals.js';
-import roleRequestRoutes from './routes/roleRequests.js'; // ✅ 추가된 import
-import clubSettingsRoutes from './routes/clubSettings.js'; // ✅ 추가된 import
+import roleRequestRoutes from './routes/roleRequests.js';
+import clubSettingsRoutes from './routes/clubSettings.js';
 import teamJoinRequestRoutes from './routes/teamJoinRequests.js';
 import predictionRoutes from './routes/predictions.js';
 import inquiryRoutes from './routes/inquiries.js';
@@ -39,7 +39,7 @@ const httpServer = createServer(app);
 app.use(helmet());
 app.use(morgan('dev'));
 
-// CORS 설정 (테스트 환경에서는 비활성화 가능)
+// CORS 설정 (기존과 동일)
 if (env.DISABLE_CORS) {
   console.log('[CORS] CORS disabled for testing');
   app.use(cors({
@@ -64,46 +64,55 @@ app.options('*', cors());
 
 app.use(express.json());
 
-// 정적 파일 제공
+// 정적 파일 제공 (기존과 동일)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-// ========== 라우터 설정 ==========
 
-// Public routes (인증 불필요)
+// ==========================================================
+// ========== [수정된] 라우터 설정 (Router Configuration) ==========
+// ==========================================================
+
+// -----------------------------------------------------------------
+// 1. Public Routes (인증이 전혀 필요 없는 공개 경로)
+// -----------------------------------------------------------------
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // 로그인, 회원가입, 비밀번호찾기 등
 app.use('/api/clubs', clubRoutes);
 app.use('/api/invites', inviteRoutes);
 
-// Protected routes (인증 필요)
-app.use('/api', requireAuth, enrichRole);
 
-// 승인 관련 엔드포인트 (승인 확인 불필요)
-app.use('/api/approvals', approvalRoutes);
+// -----------------------------------------------------------------
+// 2. Protected Routes (여기서부터는 모든 경로에 최소 '로그인'이 필요)
+// -----------------------------------------------------------------
 
-// 승인이 필요한 다른 엔드포인트들
-app.use('/api', requireApproval);
-app.use('/api/users', userRoutes);
-app.use('/api/teams', teamRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/role-requests', roleRequestRoutes); // ✅ roleRequests 라우터 등록
-app.use('/api/club-settings', clubSettingsRoutes); // ✅ clubSettings 라우터 등록
-app.use('/api/team-join-requests', teamJoinRequestRoutes);
-app.use('/api/predictions', predictionRoutes);
-app.use('/api/inquiries', inquiryRoutes);
-app.use('/api/team-issues', teamIssueRoutes);
-app.use('/api/admin/clubs', adminClubRoutes);
-app.use('/api/admin/settings', adminSettingsRoutes);
-app.use('/api/admin/analytics', adminAnalyticsRoutes);
+// '계정 승인'은 필요 없지만 '로그인'은 필요한 경로들
+app.use('/api/approvals', requireAuth, enrichRole, approvalRoutes);
+app.use('/api/users', requireAuth, enrichRole, userRoutes);
 
-// Error handler
+// '로그인' 뿐만 아니라 '계정 승인'까지 받아야 접근 가능한 경로들
+// 재사용을 위해 미들웨어 배열 생성
+const needsApproval = [requireAuth, enrichRole, requireApproval];
+
+app.use('/api/teams', needsApproval, teamRoutes);
+app.use('/api/reports', needsApproval, reportRoutes);
+app.use('/api/dashboard', needsApproval, dashboardRoutes);
+app.use('/api/ai', needsApproval, aiRoutes);
+app.use('/api/role-requests', needsApproval, roleRequestRoutes);
+app.use('/api/club-settings', needsApproval, clubSettingsRoutes);
+app.use('/api/team-join-requests', needsApproval, teamJoinRequestRoutes);
+app.use('/api/predictions', needsApproval, predictionRoutes);
+app.use('/api/inquiries', needsApproval, inquiryRoutes);
+app.use('/api/team-issues', needsApproval, teamIssueRoutes);
+app.use('/api/admin/clubs', needsApproval, adminClubRoutes);
+app.use('/api/admin/settings', needsApproval, adminSettingsRoutes);
+app.use('/api/admin/analytics', needsApproval, adminAnalyticsRoutes);
+
+// Error handler (기존과 동일)
 app.use(errorHandler);
 
-// ========== 서버 시작 ==========
+// ========== 서버 시작 (기존과 동일) ==========
 connectDB().then(async () => {
   // 데이터베이스 정리 작업
   try {
