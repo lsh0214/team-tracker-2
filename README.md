@@ -89,7 +89,7 @@ bash
 편집
 
 - git clone https://github.com/hg554889/team-tracker-2.git
-- cd team-tracker-ver2
+- cd team-tracker-2
 
 ## 2. 백엔드 설치 & 실행
 ``` bash
