@@ -6,18 +6,29 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true, index: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
-  studentId: { type: String, required: false, index: true }, // 학번 중복 검사를 위한 인덱스 추가
+  
+  studentId: { type: String, required: false, unique: true, sparse: true },
+  
   role: { type: String, enum: Object.values(Roles), default: Roles.MEMBER },
   clubId: { type: String, index: true },
-  isApproved: { type: Boolean, default: false },
+
   approvalStatus: { 
     type: String, 
     enum: ['pending', 'approved', 'rejected'], 
     default: 'pending' 
   },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  approvedAt: { type: Date }
-}, { timestamps: true });
+  approvedAt: { type: Date },
+
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+UserSchema.virtual('isApproved').get(function() {
+  return this.approvalStatus === 'approved';
+});
 
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
